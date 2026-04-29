@@ -1,73 +1,163 @@
+# CNN Image Classification — Fungi Detection
 
-# CNN Fungi Classification
+A computer vision project implementing a Convolutional Neural Network (CNN) 
+using TensorFlow and Keras to classify fungi images — demonstrating deep 
+learning architecture design, training dynamics analysis, and responsible 
+deployment considerations for image classification systems.
 
-This project demonstrates the implementation of a Convolutional Neural Network (CNN) using TensorFlow and Keras to classify images of fungi. The model is trained on a dataset of preprocessed images, and the training process is monitored over 10 epochs.
+---
 
-## Project Structure
+## Business Context
 
-- **Data Loading**: The data is preprocessed and loaded from external URLs using `requests` and `pickle` libraries.
-- **Model Architecture**: The model consists of convolutional layers, max-pooling layers, and dense layers, designed for image classification.
-- **Training**: The model is trained using the Adam optimizer and sparse categorical crossentropy loss.
-- **Evaluation**: The model's performance is evaluated using accuracy and loss metrics on both training and validation datasets.
+Image classification models are increasingly deployed in high-stakes 
+contexts — medical diagnosis, quality control, security screening, and 
+environmental monitoring. Understanding how CNNs learn, where they fail, 
+and what governance controls are needed before deployment is as important 
+as achieving high accuracy on a test set.
 
-## Installation
+This project builds a binary image classifier for fungi detection, 
+documents training dynamics across epochs, and examines the governance 
+implications of deploying computer vision models in real-world contexts.
 
-1. Clone the repository:
-   ```bash
-   git clone repository-url
-   ```
-2. Install the required packages:
-   ```bash
-   pip install -r requirements.txt
-   ```
+---
 
-## Usage
+## What It Does
 
-Run the Jupyter notebook or Python script to train the CNN model on the fungi dataset:
-```bash
-python cnn_fungi_classification.py
-```
+- Loads and preprocesses fungi image data from external sources using 
+  `requests` and `pickle`
+- Builds a CNN architecture with Conv2D, MaxPooling2D, Flatten, and 
+  Dense layers using TensorFlow/Keras
+- Trains with Adam optimizer and sparse categorical crossentropy loss
+- Monitors training vs. validation accuracy and loss across 10 epochs
+- Documents epoch-by-epoch performance trends and convergence behavior
+- Analyzes limitations and recommended improvements
+
+---
 
 ## Model Architecture
 
-The CNN model is structured as follows:
+Input: Preprocessed fungi images
+↓
+Conv2D (32 filters, 3×3 kernel, ReLU)
+↓
+MaxPooling2D (2×2)
+↓
+Flatten
+↓
+Dense (64 units, ReLU)
+↓
+Output: Dense (2 units, Sigmoid) → binary classification
 
-- **Conv2D Layer**: 32 filters, 3x3 kernel size, ReLU activation
-- **MaxPooling2D Layer**: 2x2 pool size
-- **Flatten Layer**: Flattens the input
-- **Dense Layer**: 64 units, ReLU activation
-- **Output Layer**: 2 units, Sigmoid activation (for binary classification)
+**Optimizer:** Adam  
+**Loss:** Sparse categorical crossentropy  
+**Epochs:** 10  
+**Peak validation accuracy:** ~76% (Epoch 4)
 
-## Insights on Epoch Results
+---
 
-The model was trained over 10 epochs, and the results showed a gradual improvement in both accuracy and loss on the validation dataset:
+## Training Analysis
 
-- **Epoch 1**: The model started with a low accuracy of around 44.76% and a high loss, indicating that the model was initially underfitting.
-- **Epoch 2-4**: Significant improvement was observed, with the accuracy increasing and loss decreasing. By Epoch 4, the validation accuracy reached 76%, showing that the model was learning the features effectively.
-- **Epoch 5-7**: The model's performance stabilized, with validation accuracy hovering around 72-74% and a slight decrease in validation loss. This indicates that the model was converging.
-- **Epoch 8-10**: The accuracy remained stable, but there was no significant improvement, suggesting that the model might have reached its optimal learning capacity with the given architecture and data.
+| Epoch | Behavior |
+|-------|----------|
+| 1 | Low accuracy (~44%), high loss — model underfitting, random initialization |
+| 2–4 | Significant improvement — model learning spatial features, validation accuracy reaches 76% |
+| 5–7 | Stabilization — accuracy 72–74%, loss decreasing slowly, model converging |
+| 8–10 | Plateau — no significant improvement, model approaching capacity limit |
 
-### Possible Improvements
+**Key observation:** The gap between training and validation performance 
+remained small throughout, suggesting reasonable generalization without 
+severe overfitting. However, plateauing at 76% indicates the architecture 
+needs improvement before production use.
 
-1. **Data Augmentation**: Implementing data augmentation techniques such as rotation, zoom, or horizontal flip could help improve model generalization.
-2. **Model Tuning**: Experimenting with different model architectures, such as deeper networks or alternative activation functions, could lead to better performance.
-3. **Regularization**: Adding dropout layers or L2 regularization might help prevent overfitting and improve validation performance.
-4. **Learning Rate Adjustment**: Implementing a learning rate scheduler could help the model converge more effectively.
-5. **Cross-Validation**: Using cross-validation could provide a more robust evaluation of the model's performance.
+---
 
-## License
+## Honest Assessment of Results
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+76% validation accuracy on a binary classification task is a proof of 
+concept, not a production-ready result. For context:
 
-## Acknowledgments
+- A random classifier would achieve ~50% on a balanced binary dataset
+- A production medical imaging classifier typically requires 90%+ with 
+  formal clinical validation
+- The plateau at epoch 8–10 suggests the current architecture has 
+  reached its learning capacity with the given data
 
-- The dataset and some of the utilities are provided by [BC-EDX](https://static.bc-edx.com/).
-- This project uses TensorFlow, Keras, and Scikit-learn for model development and evaluation.
+This is documented honestly because deploying an underperforming model 
+in a high-stakes context is a governance failure, not just a technical 
+one.
 
-``
+---
 
-### Explanation of the Epoch Results
+## Recommended Improvements
 
-- **Accuracy & Loss Trends**: As the epochs progress, the model shows an improvement in accuracy and a decrease in loss. This is typical behavior when the model starts to learn the features in the data effectively. However, by the later epochs (8-10), the model's performance stabilizes, indicating that it may not improve much further without adjustments to the model architecture, data, or training process.
-- **Validation vs. Training**: The validation accuracy and loss are crucial metrics. If there's a significant gap between training and validation performance, it might indicate overfitting. In this case, the model maintains a relatively close validation accuracy to the training accuracy, suggesting a good generalization to unseen data.
+**Data Augmentation**  
+Rotation, zoom, horizontal flip, and brightness variation would increase 
+effective training set size and improve generalization to real-world 
+image variation.
+
+**Deeper Architecture**  
+Additional convolutional blocks (Conv2D → MaxPooling2D → Conv2D → 
+MaxPooling2D) would enable the model to learn more complex spatial 
+features at multiple scales.
+
+**Regularization**  
+Dropout layers between Dense layers would reduce overfitting risk as 
+the model is deepened.
+
+**Transfer Learning**  
+Using a pretrained model (ResNet50, EfficientNet, MobileNetV2) as a 
+feature extractor would dramatically improve accuracy with limited 
+training data — a standard approach in production computer vision.
+
+**Cross-Validation**  
+K-fold cross-validation would provide a more robust accuracy estimate 
+than a single train/validation split.
+
+---
+
+## Governance & Responsible Deployment Notes
+
+**Accuracy thresholds before deployment**  
+76% accuracy is insufficient for any consequential application. Before 
+deployment, minimum accuracy thresholds should be defined based on the 
+cost of false positives vs. false negatives in the specific use case. 
+For fungi classification in a food safety context, a false negative 
+(missing a toxic species) has far greater consequences than a false 
+positive.
+
+**Dataset bias**  
+Image classifiers are vulnerable to dataset bias — if training images 
+were collected under specific lighting conditions, angles, or backgrounds, 
+the model may fail on images that look different. Distribution shift 
+between training data and deployment conditions is a primary failure 
+mode for computer vision systems.
+
+**Explainability**  
+CNNs are black boxes — it is not immediately obvious which image features 
+drive a classification decision. Tools like Grad-CAM (Gradient-weighted 
+Class Activation Mapping) can visualize which regions of an image the 
+model is attending to, providing a form of explainability for human 
+reviewers.
+
+**Human oversight**  
+For any consequential classification task (medical, legal, safety), 
+model predictions should be reviewed by a qualified human before action 
+is taken. The model provides a signal — the human makes the decision.
+
+---
+
+## Origin
+
+This project was developed as part of the Ohio State University 
+AI & ML Bootcamp (2024) and expanded with technical analysis and 
+governance framing for portfolio purposes.
+
+---
+
+## Author
+
+**Steven Hill**  
+AI Ethics & Policy Professional | Purdue University MSAI  
+[LinkedIn](https://linkedin.com/in/stevenrhill) | 
+[GitHub](https://github.com/srhill12)
 
